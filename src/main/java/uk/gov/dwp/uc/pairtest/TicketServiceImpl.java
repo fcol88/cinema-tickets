@@ -47,11 +47,20 @@ public class TicketServiceImpl implements TicketService {
     
     private void checkTicketQuantityValidity(PurchaseRequestDTO ticketRequestDto) {
 		hasMinimumAdultAttendance(ticketRequestDto.getAdultTickets());
+		hasEnoughAdultsForInfants(ticketRequestDto.getAdultTickets(), 
+				ticketRequestDto.getInfantTickets());
 	}
     
     private void hasMinimumAdultAttendance(int noOfAdults) {
 		if (noOfAdults < MIN_ADULT_TICKETS) {
 			throw new InvalidPurchaseException("At least " + MIN_ADULT_TICKETS + " adult ticket must be purchased");
+		}
+	}
+    
+    private void hasEnoughAdultsForInfants(int noOfAdults, int noOfInfants) {
+		if (noOfAdults < noOfInfants) {
+			throw new InvalidPurchaseException("There must be at least 1 adult "
+					+ "per infant for seating");
 		}
 	}
 

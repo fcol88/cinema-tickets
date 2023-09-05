@@ -60,5 +60,18 @@ class TicketServiceImplTest {
 		);
 		assertEquals("At least 1 adult ticket must be purchased", result.getMessage());
 	}
+	
+	@Test
+	void hasEnoughAdultsForInfantsRejectsWhenInvalid() {
+		TicketTypeRequest[] requests = {
+				new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 1),
+				new TicketTypeRequest(TicketTypeRequest.Type.INFANT, 2)
+		};
+		InvalidPurchaseException result = assertThrows(
+				InvalidPurchaseException.class,
+				() -> ticketServiceImpl.purchaseTickets(VALID_ACCOUNT_ID, requests)
+		);
+		assertEquals("There must be at least 1 adult per infant for seating", result.getMessage());
+	}
 
 }
