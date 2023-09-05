@@ -49,5 +49,16 @@ class TicketServiceImplTest {
 		);
 		assertEquals("Ticket requests cannot contain negative values", result.getMessage());
 	}
+	
+	@Test
+	void hasMinimumAdultAttendanceRejectsWhenInvalid() {
+		TicketTypeRequest request = new TicketTypeRequest(
+				TicketTypeRequest.Type.CHILD, TicketServiceImpl.MIN_ADULT_TICKETS - 1);
+		InvalidPurchaseException result = assertThrows(
+				InvalidPurchaseException.class,
+				() -> ticketServiceImpl.purchaseTickets(VALID_ACCOUNT_ID, request)
+		);
+		assertEquals("At least 1 adult ticket must be purchased", result.getMessage());
+	}
 
 }
