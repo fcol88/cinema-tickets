@@ -2,22 +2,27 @@ package uk.gov.dwp.uc.pairtest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import thirdparty.paymentgateway.TicketPaymentServiceImpl;
 import uk.gov.dwp.uc.pairtest.domain.TicketTypeRequest;
 import uk.gov.dwp.uc.pairtest.exception.InvalidPurchaseException;
 
 class TicketServiceImplTest {
 	
 	private TicketServiceImpl ticketServiceImpl;
+	private TicketPaymentServiceImpl ticketPaymentServiceImpl;
 	
 	private static final Long VALID_ACCOUNT_ID = 1L;
 	
 	@BeforeEach
 	public void setup() {
-		ticketServiceImpl = new TicketServiceImpl();
+		ticketPaymentServiceImpl = mock(TicketPaymentServiceImpl.class);
+		ticketServiceImpl = new TicketServiceImpl(ticketPaymentServiceImpl);
 	}
 	
 	@Test
@@ -82,6 +87,27 @@ class TicketServiceImplTest {
 				() -> ticketServiceImpl.purchaseTickets(VALID_ACCOUNT_ID, request)
 		);
 		assertEquals("You may only buy " + TicketServiceImpl.MAX_TICKETS_PER_TRANSACTION + " tickets at once", result.getMessage());
+	}
+	
+	@Test
+	void ticketServiceCalculatesCorrectPayment() {
+		
+		//two adults, one child, one infant
+		var adultTotal = TicketServiceImpl.ADULT_TICKET_PRICE * TicketServiceImpl.MIN_ADULT_TICKETS;
+		var childTotal = TicketServiceImpl.CHILD_TICKET_PRICE;
+		var infantTotal = TicketServiceImpl.INFANT_TICKET_PRICE;
+		var expected = adultTotal + childTotal + infantTotal;
+		
+		TicketTypeRequest[] requests = {
+				new TicketTypeRequest(TicketTypeRequest.Type.ADULT, TicketServiceImpl.MIN_ADULT_TICKETS),
+				new TicketTypeRequest(TicketTypeRequest.Type.CHILD, 1),
+				new TicketTypeRequest(TicketTypeRequest.Type.INFANT, 1)
+		};
+		
+		ticketServiceImpl.purchaseTickets(VALID_ACCOUNT_ID, requests);
+		
+		verify(ticketPaymentServiceImpl).makePayment(VALID_ACCOUNT_ID, expected);
+		
 	}
 
 }

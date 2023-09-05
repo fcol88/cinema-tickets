@@ -1,5 +1,6 @@
 package uk.gov.dwp.uc.pairtest;
 
+import thirdparty.paymentgateway.TicketPaymentServiceImpl;
 import uk.gov.dwp.uc.pairtest.domain.PurchaseRequestDTO;
 import uk.gov.dwp.uc.pairtest.domain.TicketTypeRequest;
 import uk.gov.dwp.uc.pairtest.exception.InvalidPurchaseException;
@@ -8,6 +9,12 @@ public class TicketServiceImpl implements TicketService {
     /**
      * Should only have private methods other than the one below.
      */
+	
+	private final TicketPaymentServiceImpl ticketPaymentService;
+	
+	public TicketServiceImpl(TicketPaymentServiceImpl ticketPaymentService) {
+		this.ticketPaymentService = ticketPaymentService;
+	}
 	
 	//Candidates for externalisation into app props or similar if using Spring
 	//Package-level visibility for easier testing
@@ -21,6 +28,8 @@ public class TicketServiceImpl implements TicketService {
     public void purchaseTickets(Long accountId, TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
     	isValidAccount(accountId);
     	PurchaseRequestDTO ticketRequestDto = collateTicketQuantities(ticketTypeRequests);
+    	var totalPrice = getTotalPrice(ticketRequestDto);
+    	ticketPaymentService.makePayment(accountId, totalPrice);
     }
     
     private void isValidAccount(Long accountId) throws InvalidPurchaseException {
@@ -70,6 +79,12 @@ public class TicketServiceImpl implements TicketService {
 			throw new InvalidPurchaseException("You may only buy " 
 					+ MAX_TICKETS_PER_TRANSACTION + " tickets at once");
 		}		
+	}
+    
+    private int getTotalPrice(PurchaseRequestDTO ticketRequestDto) {
+		return ticketRequestDto.getAdultTickets() * ADULT_TICKET_PRICE
+				+ ticketRequestDto.getAdultTickets() * CHILD_TICKET_PRICE
+				+ ticketRequestDto.getAdultTickets() * INFANT_TICKET_PRICE;
 	}
 
 }
