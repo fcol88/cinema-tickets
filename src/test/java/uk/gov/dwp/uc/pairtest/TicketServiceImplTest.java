@@ -73,5 +73,15 @@ class TicketServiceImplTest {
 		);
 		assertEquals("There must be at least 1 adult per infant for seating", result.getMessage());
 	}
+	
+	@Test
+	void isInsideTicketLimitRejectsWhenInvalid() {
+		TicketTypeRequest request = new TicketTypeRequest(TicketTypeRequest.Type.ADULT, TicketServiceImpl.MAX_TICKETS_PER_TRANSACTION + 1);
+		InvalidPurchaseException result = assertThrows(
+				InvalidPurchaseException.class,
+				() -> ticketServiceImpl.purchaseTickets(VALID_ACCOUNT_ID, request)
+		);
+		assertEquals("You may only buy " + TicketServiceImpl.MAX_TICKETS_PER_TRANSACTION + " tickets at once", result.getMessage());
+	}
 
 }
