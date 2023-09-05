@@ -1,6 +1,7 @@
 package uk.gov.dwp.uc.pairtest;
 
 import thirdparty.paymentgateway.TicketPaymentServiceImpl;
+import thirdparty.seatbooking.SeatReservationServiceImpl;
 import uk.gov.dwp.uc.pairtest.domain.PurchaseRequestDTO;
 import uk.gov.dwp.uc.pairtest.domain.TicketTypeRequest;
 import uk.gov.dwp.uc.pairtest.exception.InvalidPurchaseException;
@@ -11,9 +12,12 @@ public class TicketServiceImpl implements TicketService {
      */
 	
 	private final TicketPaymentServiceImpl ticketPaymentService;
+	private final SeatReservationServiceImpl seatReservationService;
 	
-	public TicketServiceImpl(TicketPaymentServiceImpl ticketPaymentService) {
+	public TicketServiceImpl(TicketPaymentServiceImpl ticketPaymentService,
+			SeatReservationServiceImpl seatReservationService) {
 		this.ticketPaymentService = ticketPaymentService;
+		this.seatReservationService = seatReservationService;
 	}
 	
 	//Candidates for externalisation into app props or similar if using Spring
@@ -30,6 +34,7 @@ public class TicketServiceImpl implements TicketService {
     	PurchaseRequestDTO ticketRequestDto = collateTicketQuantities(ticketTypeRequests);
     	var totalPrice = getTotalPrice(ticketRequestDto);
     	ticketPaymentService.makePayment(accountId, totalPrice);
+    	seatReservationService.reserveSeat(accountId, ticketRequestDto.getTotalSeats());
     }
     
     private void isValidAccount(Long accountId) throws InvalidPurchaseException {

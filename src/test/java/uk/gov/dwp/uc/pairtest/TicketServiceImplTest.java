@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import thirdparty.paymentgateway.TicketPaymentServiceImpl;
+import thirdparty.seatbooking.SeatReservationServiceImpl;
 import uk.gov.dwp.uc.pairtest.domain.TicketTypeRequest;
 import uk.gov.dwp.uc.pairtest.exception.InvalidPurchaseException;
 
@@ -16,13 +17,16 @@ class TicketServiceImplTest {
 	
 	private TicketServiceImpl ticketServiceImpl;
 	private TicketPaymentServiceImpl ticketPaymentServiceImpl;
+	private SeatReservationServiceImpl seatReservationServiceImpl;
 	
 	private static final Long VALID_ACCOUNT_ID = 1L;
 	
 	@BeforeEach
 	public void setup() {
 		ticketPaymentServiceImpl = mock(TicketPaymentServiceImpl.class);
-		ticketServiceImpl = new TicketServiceImpl(ticketPaymentServiceImpl);
+		seatReservationServiceImpl = mock(SeatReservationServiceImpl.class);
+		ticketServiceImpl = new TicketServiceImpl(ticketPaymentServiceImpl,
+				seatReservationServiceImpl);
 	}
 	
 	@Test
@@ -107,6 +111,25 @@ class TicketServiceImplTest {
 		ticketServiceImpl.purchaseTickets(VALID_ACCOUNT_ID, requests);
 		
 		verify(ticketPaymentServiceImpl).makePayment(VALID_ACCOUNT_ID, expected);
+		
+	}
+	
+	@Test
+	void ticketServiceCalculatesCorrectSeats() {
+		
+		var adultTotal = TicketServiceImpl.MIN_ADULT_TICKETS;
+		var childTotal = 1;
+		var expected = adultTotal + childTotal;
+		
+		TicketTypeRequest[] requests = {
+				new TicketTypeRequest(TicketTypeRequest.Type.ADULT, TicketServiceImpl.MIN_ADULT_TICKETS),
+				new TicketTypeRequest(TicketTypeRequest.Type.CHILD, 1),
+				new TicketTypeRequest(TicketTypeRequest.Type.INFANT, 1)
+		};
+		
+		ticketServiceImpl.purchaseTickets(VALID_ACCOUNT_ID, requests);
+		
+		verify(seatReservationServiceImpl).reserveSeat(VALID_ACCOUNT_ID, expected);
 		
 	}
 
