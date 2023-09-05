@@ -13,6 +13,8 @@ class TicketServiceImplTest {
 	
 	private TicketServiceImpl ticketServiceImpl;
 	
+	private static final Long VALID_ACCOUNT_ID = 1L;
+	
 	@BeforeEach
 	public void setup() {
 		ticketServiceImpl = new TicketServiceImpl();
@@ -26,6 +28,26 @@ class TicketServiceImplTest {
 				() -> ticketServiceImpl.purchaseTickets(0L, request)
 		);
 		assertEquals("Account ID is invalid", result.getMessage());
+	}
+	
+	@Test
+	void accountValidationRejectsWhenLessThanOne() {
+		TicketTypeRequest request = new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 1);
+		InvalidPurchaseException result = assertThrows(
+				InvalidPurchaseException.class,
+				() -> ticketServiceImpl.purchaseTickets(null, request)
+		);
+		assertEquals("Account ID is invalid", result.getMessage());
+	}
+	
+	@Test
+	void isNonNegativeTicketCountRejectsWhenNegativeTicketCount() {
+		TicketTypeRequest request = new TicketTypeRequest(TicketTypeRequest.Type.ADULT, -1);
+		InvalidPurchaseException result = assertThrows(
+				InvalidPurchaseException.class,
+				() -> ticketServiceImpl.purchaseTickets(VALID_ACCOUNT_ID, request)
+		);
+		assertEquals("Ticket requests cannot contain negative values", result.getMessage());
 	}
 
 }
