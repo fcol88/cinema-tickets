@@ -30,7 +30,7 @@ Given the void return of `purchaseTickets` with a thrown exception, I've leaned 
 
 ## Assumptions I've _not_ made
 
-I've not assumed configuration is guaranteed to be static. I've called out that the prices and objective minimum number of adults (as opposed to lap-donors for infants) may change, and given the gouging some cinemas do (have I assumed it was a cinema? I think I've assumed it was a cinema), it's not a guarantee that infants will always go free - so the calculation is performed but with zero as the multiplicand. Similarly, I've not assumed a stationary maximum tickets per sale value. If I was using Spring, I would've brought these in as `@Value`s.
+I've not assumed configuration is guaranteed to be static. I've called out that the prices and objective minimum number of adults (as opposed to lap-donors for infants) may change, and given the gouging some cinemas do (~~have I assumed it was a cinema? I think I've assumed it was a cinema~~ it was in the repository name...), it's not a guarantee that infants will always go free - so the calculation is performed but with zero as the multiplicand. Similarly, I've not assumed a stationary maximum tickets per sale value. If I was using Spring, I would've brought these in as `@Value`s.
 
 I've not assumed restrictions on multiple `TicketTypeRequest`s of the same `TicketTypeRequest.Type` - I envisioned this being multiple groups booking together and needing to be logically separate for some other reason, as long as they don't exceed the maximum ticket count.
 
