@@ -34,4 +34,4 @@ I've not assumed configuration is guaranteed to be static. I've called out that 
 
 I've not assumed restrictions on multiple `TicketTypeRequest`s of the same `TicketTypeRequest.Type` - I envisioned this being multiple groups booking together and needing to be logically separate for some other reason, as long as they don't exceed the maximum ticket count.
 
-Thank you once more for your consideration, and
+Thank you once more for your consideration, and I look forward to discussing this at interview.
