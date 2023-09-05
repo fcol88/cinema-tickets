@@ -28,5 +28,9 @@ public class PurchaseRequestDTO {
 	public int getTotalTickets() {
 		return adultTickets + childTickets + infantTickets;
 	}
+	
+	public int getTotalSeats() {
+		return adultTickets + childTickets;
+	}
 
 }

@@ -33,5 +33,10 @@ class PurchaseRequestDTOTest {
 	void purchaseRequestIncludesInfantsInTotalTickets() {
 		assertEquals(6, dto.getTotalTickets());
 	}
+	
+	@Test
+	void purchaseRequestOmitsInfantsFromTotalSeats() {
+		assertEquals(5, dto.getTotalSeats());
+	}
 
 }
