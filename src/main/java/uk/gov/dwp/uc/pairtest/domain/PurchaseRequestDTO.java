@@ -24,5 +24,9 @@ public class PurchaseRequestDTO {
 			throw new IllegalStateException("Unexpected ticket type");
 		}
 	}
+	
+	public int getTotalTickets() {
+		return adultTickets + childTickets + infantTickets;
+	}
 
 }

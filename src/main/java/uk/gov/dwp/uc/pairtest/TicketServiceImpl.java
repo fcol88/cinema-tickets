@@ -49,6 +49,7 @@ public class TicketServiceImpl implements TicketService {
 		hasMinimumAdultAttendance(ticketRequestDto.getAdultTickets());
 		hasEnoughAdultsForInfants(ticketRequestDto.getAdultTickets(), 
 				ticketRequestDto.getInfantTickets());
+		isInsideTicketLimit(ticketRequestDto.getTotalTickets());
 	}
     
     private void hasMinimumAdultAttendance(int noOfAdults) {
@@ -62,6 +63,13 @@ public class TicketServiceImpl implements TicketService {
 			throw new InvalidPurchaseException("There must be at least 1 adult "
 					+ "per infant for seating");
 		}
+	}
+    
+    private void isInsideTicketLimit(int totalTickets) {
+		if (totalTickets > MAX_TICKETS_PER_TRANSACTION) {
+			throw new InvalidPurchaseException("You may only buy " 
+					+ MAX_TICKETS_PER_TRANSACTION + " tickets at once");
+		}		
 	}
 
 }
